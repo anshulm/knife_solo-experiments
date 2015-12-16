@@ -1,6 +1,6 @@
 {
   "run_list": [
-
+    "recipe[knife_solo-experiments]"
   ],
   "automatic": {
     "ipaddress": "127.0.0.1"
