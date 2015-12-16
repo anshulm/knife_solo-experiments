@@ -1,6 +1,6 @@
 default['app'] = 'knife_solo-experiments'
 
-default['ruby']['version'] = '2.2.2'
+default['ruby']['version'] = '2.1.2'
 
 default['group'] = 'chef'
 
