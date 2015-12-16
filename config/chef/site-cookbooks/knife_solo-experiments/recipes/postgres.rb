@@ -14,7 +14,7 @@ execute "create new postgres user" do
   not_if { `sudo -u postgres psql -tAc \"SELECT * FROM pg_roles WHERE rolname='#{node['db']['user']['name']}'\" | wc -l`.chomp == "1" }
 end
 
-create new postgres database
+# create new postgres database
 execute "create new postgres database" do
   user "postgres"
   command "psql -c \"create database #{node['app']} owner #{node['db']['user']['name']};\""

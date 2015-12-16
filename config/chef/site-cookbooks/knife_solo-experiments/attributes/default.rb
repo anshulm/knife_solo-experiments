@@ -1,4 +1,4 @@
-default['app'] = 'knife_solo-experiments'
+default['app'] = 'knifeSoloExperiments'
 
 default['ruby']['version'] = '2.1.2'
 

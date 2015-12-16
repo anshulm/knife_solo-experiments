@@ -15,7 +15,8 @@ PORT=$3
 ssh-copy-id -i ~/.ssh/id_rsa.pub -p $PORT vagrant@$IP
 
 # install chef
-cd chef && knife solo prepare -p $PORT vagrant@$IP
+#cd chef && knife solo prepare -p $PORT vagrant@$IP
+cd chef
 
 # execute the run list
 knife solo cook -p $PORT vagrant@$IP
