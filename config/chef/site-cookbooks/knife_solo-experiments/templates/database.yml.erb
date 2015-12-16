@@ -1,7 +1,7 @@
 production:
   adapter: postgresql
   encoding: unicode
-  database: <%= node['app'] %>
+  database: <%= node['app'].downcase %>
   pool: 5
   host: localhost
   username: <%= node['db']['user']['name'] %>
