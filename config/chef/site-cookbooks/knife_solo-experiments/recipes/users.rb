@@ -14,7 +14,7 @@ end
 bash "give group sudo privileges" do
   code <<-EOH
     sed -i '/%#{node['group']}.*/d' /etc/sudoers
-    echo '%#{node['group']} ALL=(ALL) ALL' >> /etc/sudoers
+    echo '%#{node['group']} ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
   EOH
-  not_if "grep -xq '%#{node['group']} ALL=(ALL) ALL' /etc/sudoers"
+  not_if "grep -xq '%#{node['group']} ALL=(ALL) NOPASSWD: ALL' /etc/sudoers"
 end
