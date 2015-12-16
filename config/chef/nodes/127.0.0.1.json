@@ -4,6 +4,7 @@
     "recipe[knife_solo-experiments::users]",
     "recipe[knife_solo-experiments::rbenv]",
     "recipe[knife_solo-experiments::nginx]",
+    "recipe[knife_solo-experiments::postgres]",
     "recipe[knife_solo-experiments::app]"
   ],
   "automatic": {
