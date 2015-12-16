@@ -1,6 +1,8 @@
 {
   "run_list": [
-    "recipe[knife_solo-experiments]"
+    "recipe[knife_solo-experiments]",
+    "recipe[knife_solo-experiments::users]",
+    "recipe[knife_solo-experiments::rbenv]"
   ],
   "automatic": {
     "ipaddress": "127.0.0.1"
