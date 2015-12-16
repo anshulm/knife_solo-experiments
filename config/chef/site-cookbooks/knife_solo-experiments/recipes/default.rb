@@ -1,4 +1,4 @@
-execute 'apt-get update'
+# execute 'apt-get update'
 
 package "telnet"
 package "postfix"
