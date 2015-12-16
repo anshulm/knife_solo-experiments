@@ -11,14 +11,14 @@ USER=$1
 IP=$2
 PORT=$3
 
-# upload key for root
+# upload key for root - need to have a root user. Check EC2 specific changes
 ssh-copy-id -i ~/.ssh/id_rsa.pub -p $PORT vagrant@$IP
 
 # install chef
-cd chef && knife solo prepare -p $PORT $USER@$IP
+cd chef && knife solo prepare -p $PORT vagrant@$IP
 
 # execute the run list
-knife solo cook -p $PORT $USER@$IP
+knife solo cook -p $PORT vagrant@$IP
 
 # upload key for user
 #ssh-copy-id -i ~/.ssh/id_rsa.pub -p $PORT $USER@$IP
