@@ -15,6 +15,7 @@ package "libxslt1-dev"
 package "libpq-dev"
 package "build-essential"
 package "tree"
+package "nodejs"
 
 # set timezone
 # bash "set timezone" do
