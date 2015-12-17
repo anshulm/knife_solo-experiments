@@ -50,6 +50,6 @@ group :development do
   gem 'capistrano-rails'
   gem 'capistrano-bundler'
   gem 'capistrano-rbenv'
-  gem 'capistrano3-unicorn'
+  gem 'capistrano-passenger'
 end
 
