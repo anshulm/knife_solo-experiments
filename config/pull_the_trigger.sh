@@ -15,17 +15,17 @@ PORT=$3
 ssh-copy-id -i ~/.ssh/id_rsa.pub -p $PORT vagrant@$IP
 
 # install chef
-cd chef && knife solo prepare -p $PORT vagrant@$IP
-#cd chef
+#cd chef && knife solo prepare -p $PORT vagrant@$IP
+cd chef
 
 # execute the run list
 knife solo cook -p $PORT vagrant@$IP
 
 # upload key for user
-ssh-copy-id -i ~/.ssh/id_rsa.pub -p $PORT $USER@$IP
+#ssh-copy-id -i ~/.ssh/id_rsa.pub -p $PORT $USER@$IP
 
 # upload app
-cd ../.. && cap production deploy
+#cd ../.. && cap production deploy
 
 # restart nginx
-ssh -p $PORT -t $USER@$IP 'sudo service nginx restart'
+#ssh -p $PORT -t $USER@$IP 'sudo service nginx restart'

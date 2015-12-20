@@ -1,49 +1,29 @@
-bash "Installing Passenger Open Source Edition" do
+bash "Install PGP key and add HTTPS support for APT" do
   code <<-EOF
-  gem install passenger -v #{node['passenger-nginx']['passenger']['version']}
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7
+    sudo apt-get install -y apt-transport-https ca-certificates
   EOF
-  user "root"
-
-  regex = Regexp.escape("passenger (#{node['passenger-nginx']['passenger']['version']})")
-  not_if { `bash -c "source #{node['passenger-nginx']['rvm']['rvm_shell']} && gem list"`.lines.grep(/^#{regex}/).count > 0 }
 end
 
-bash "Installing passenger nginx module and nginx from source" do
+bash "add APT repo" do
   code <<-EOF
-  source #{node['passenger-nginx']['rvm']['rvm_shell']}
-  passenger-install-nginx-module --auto --prefix=/opt/nginx --auto-download --extra-configure-flags="\"--with-http_gzip_static_module #{node['passenger-nginx']['nginx']['extra_configure_flags']}\""
+    sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main > /etc/apt/sources.list.d/passenger.list'
+    # sudo apt-get update
   EOF
-  user node['user']['name']
-  not_if { File.exists? "/opt/nginx/sbin/nginx" }
 end
 
 
-passenger_root = "/usr/local/rvm/gems/ruby-#{node['passenger-nginx']['ruby_version']}/gems/passenger-#{node['passenger-nginx']['passenger']['version']}"
+bash "Install passenger+nginx" do
+  code <<-EOF
+    sudo apt-get install -y --force-yes nginx-extras passenger
+  EOF
+end
 
-template "/opt/nginx/conf/nginx.conf" do
+template "/etc/nginx/nginx.conf" do
   source "nginx.conf.erb"
   variables({
-    :ruby_version => node['passenger-nginx']['ruby_version'],
-    :rvm => node['rvm'],
-    :passenger_root => passenger_root,
-    :passenger => node['passenger-nginx']['passenger'],
-    :nginx => node['passenger-nginx']['nginx']
-  })
-end
-
-
-default_path = "/etc/nginx/sites-enabled/default"
-execute "rm -f #{default_path}" do
-  only_if { File.exists?(default_path) }
-end
-
-directory "/etc/nginx/sites-enabled" do
-  mode 0755
-  action :create
-  not_if { File.directory? "/opt/nginx/sites-enabled" }
-end
-
-service 'nginx' do
-  supports :status => true, :restart => true, :reload => true
-  action [ :enable ]
+                passenger_ruby: "/home/#{node['user']['name']}/.rbenv/shims/ruby",
+                rails_env: node['env'],
+                app_root: "/var/www/#{node['app']}/current/public"
+            })
 end

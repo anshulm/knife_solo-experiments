@@ -1,55 +1,49 @@
-user  <%= @nginx['user'] %>;
-worker_processes  <%= @nginx['worker_processes'] %>;
+worker_processes  1;
 
-<% if @nginx['error_log'] %>
-error_log   <%= @nginx['error_log'] %>;
-<% end %>
-
-pid        logs/nginx.pid;
+error_log  /var/log/nginx/error.log;
 
 events {
-  worker_connections  1024;
+    worker_connections  1024;
 }
+
 
 http {
-  passenger_root <%= @passenger_root %>;
-  passenger_ruby /usr/local/rvm/wrappers/default/ruby;
-  passenger_max_pool_size <%= @passenger['max_pool_size'] %>;
-  passenger_min_instances <%= @passenger['min_instances'] %>;
-  passenger_pool_idle_time <%= @passenger['pool_idle_time'] %>;
-  passenger_max_instances_per_app <%= @passenger['max_instances_per_app'] %>;
-  <% if @passenger['rolling_restarts'] %>
-  passenger_rolling_restarts <%= @passenger['rolling_restarts'] %>;
-  <% end %>
+    passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
+    passenger_ruby <%= @passenger_ruby %>;
+    passenger_friendly_error_pages on;
 
-  include       mime.types;
-  default_type  application/octet-stream;
+include       mime.types;
+    default_type  application/octet-stream;
 
-  <% if @nginx['access_log'] %>
-  access_log  <%= @nginx['access_log'] %>;
-  <% end %>
 
-  sendfile        on;
-  keepalive_timeout  65;
+    sendfile        on;
 
-  # Monitoring
-  server {
-    listen 80;
-    server_name 127.0.0.1;
-    location /nginx_status {
-      stub_status on;
-      access_log   off;
-      allow 127.0.0.1;
-      deny all;
+    keepalive_timeout  65;
+
+
+    server {
+        listen       80;
+        server_name  boatflex.com;
+            passenger_enabled on;
+            rails_env <%= @rails_env %>;
+            root <%= @app_root %>;
+        client_max_body_size 10M;
+
+        location ~ ^/assets  {
+            gzip_static on;
+            add_header Cache-Control public;
+            expires 1w;
+            gzip on;
+            gzip_vary on;
+            gzip_proxied any;
+            gzip_disable "MSIE [1-6]\.";
+            gzip_comp_level 6;
+            gzip_types application/x-javascript text/css;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
     }
-  }
-
-  # Include virtual host configs
-  include sites-enabled/*;
 }
-
-
-
-<% @passenger['pre_start'].each do |url| %>
-  passenger_pre_start <%= url %>;
-<% end %>

@@ -1,41 +1,55 @@
-production:
-  adapter: postgresql
-  encoding: unicode
-  database: <%= node['app'] %>
-  pool: 5
-  host: localhost
-  username: <%= node['db']['user']['name'] %>
-  password: <%= node['db']['user']['password'] %>
+user  <%= @nginx['user'] %>;
+worker_processes  <%= @nginx['worker_processes'] %>;
 
+<% if @nginx['error_log'] %>
+error_log   <%= @nginx['error_log'] %>;
+<% end %>
 
-upstream unicorn {
-  server unix:/tmp/unicorn.<%= node['app'] %>.sock fail_timeout=0;
+pid        logs/nginx.pid;
+
+events {
+  worker_connections  1024;
 }
 
-server {
-  server_name www.<%= node['app'] %>.com;
-  return 301 $scheme://<%= node['app'] %>.com$request_uri;
-}
+http {
+  passenger_root <%= @passenger_root %>;
+  passenger_ruby /usr/local/rvm/wrappers/default/ruby;
+  passenger_max_pool_size <%= @passenger['max_pool_size'] %>;
+  passenger_min_instances <%= @passenger['min_instances'] %>;
+  passenger_pool_idle_time <%= @passenger['pool_idle_time'] %>;
+  passenger_max_instances_per_app <%= @passenger['max_instances_per_app'] %>;
+  <% if @passenger['rolling_restarts'] %>
+  passenger_rolling_restarts <%= @passenger['rolling_restarts'] %>;
+  <% end %>
 
-server {
-  listen 80 default deferred;
-  server_name <%= node['app'] %>.com;
-  root /var/www/<%= node['app'] %>/current/public;
+  include       mime.types;
+  default_type  application/octet-stream;
 
-  location ^~ /assets/ {
-    gzip_static on;
-    expires max;
-    add_header Cache-Control public;
+  <% if @nginx['access_log'] %>
+  access_log  <%= @nginx['access_log'] %>;
+  <% end %>
+
+  sendfile        on;
+  keepalive_timeout  65;
+
+  # Monitoring
+  server {
+    listen 80;
+    server_name 127.0.0.1;
+    location /nginx_status {
+      stub_status on;
+      access_log   off;
+      allow 127.0.0.1;
+      deny all;
+    }
   }
 
-  try_files $uri/index.html $uri @unicorn;
-  location @unicorn {
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
-    proxy_pass http://unicorn;
-  }
-
-  error_page 500 502 503 504 /500.html;
-  keepalive_timeout 5;
+  # Include virtual host configs
+  include sites-enabled/*;
 }
+
+
+
+<% @passenger['pre_start'].each do |url| %>
+  passenger_pre_start <%= url %>;
+<% end %>
