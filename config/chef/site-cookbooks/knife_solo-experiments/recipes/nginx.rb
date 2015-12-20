@@ -8,7 +8,7 @@ end
 bash "add APT repo" do
   code <<-EOF
     sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main > /etc/apt/sources.list.d/passenger.list'
-    # sudo apt-get update
+    sudo apt-get update
   EOF
 end
 
