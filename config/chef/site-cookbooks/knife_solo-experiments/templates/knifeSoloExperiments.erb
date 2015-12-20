@@ -1,0 +1,7 @@
+server {
+  listen 80 default_server;
+  server_name <%= @server_name %>;
+  passenger_enabled on;
+  passenger_app_env <%= @rails_env %>;
+  root <%= @app_root %>;
+}
