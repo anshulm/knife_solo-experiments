@@ -51,6 +51,6 @@ template "/etc/nginx/sites-available/#{node['app']}" do
 end
 
 available_path = "/etc/nginx/sites-available/#{node['app']}"
-execute "sudo ln -s #{available_path} /etc/nginx/sites-enabled/#{node['app']}" do
+execute "sudo ln -fs #{available_path} /etc/nginx/sites-enabled/#{node['app']}" do
   only_if { File.exists?(available_path) }
 end
